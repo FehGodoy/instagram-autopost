@@ -25,9 +25,21 @@ CSV_POSTS = PASTA / "posts.csv"
 LOG_POSTADOS = PASTA / "postados.txt"
 
 TOKEN = os.environ.get("IG_TOKEN", "").strip()
-# Tokens "IGAA..." usam graph.instagram.com; tokens "EAA..." (login unificado/Facebook) usam graph.facebook.com
-API = ("https://graph.instagram.com/v21.0" if TOKEN.startswith("IG")
-       else "https://graph.facebook.com/v21.0")
+API = ""
+
+
+def escolher_api():
+    """Descobre qual host aceita o token (instagram ou facebook)."""
+    global API
+    falhas = []
+    for host in ("https://graph.instagram.com/v21.0", "https://graph.facebook.com/v21.0"):
+        r = requests.get(f"{host}/{USER_ID}", params={"fields": "id,username", "access_token": TOKEN}, timeout=30)
+        if r.ok:
+            API = host
+            print(f"Conta: @{r.json().get('username', '?')} via {host}")
+            return
+        falhas.append(f"{host}: {r.json().get('error', {}).get('message', r.text)}")
+    erro("token não aceito:\n  " + "\n  ".join(falhas))
 USER_ID = os.environ.get("IG_USER_ID", "")
 BASE_URL = os.environ.get("VIDEO_BASE_URL", "").rstrip("/") + "/"
 
@@ -123,6 +135,7 @@ if __name__ == "__main__":
     if not USER_ID or BASE_URL == "/":
         erro("defina IG_USER_ID e VIDEO_BASE_URL")
 
+    escolher_api()
     video, legenda = proximo_post()
     if not video:
         print("Fila vazia — nada para postar.")
