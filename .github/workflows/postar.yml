@@ -2,7 +2,7 @@ name: Postar no Instagram
 
 on:
   schedule:
-    - cron: "0 * * * *"   # a cada hora (horário UTC)
+    - cron: "17 * * * *"  # a cada hora, no minuto 17 (evita o congestionamento da hora cheia)
   workflow_dispatch:       # botão para rodar manualmente
 
 permissions:
