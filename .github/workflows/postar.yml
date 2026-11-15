@@ -1,9 +1,7 @@
 name: Postar no Instagram
 
 on:
-  schedule:
-    - cron: "17 * * * *"  # a cada hora, no minuto 17 (evita o congestionamento da hora cheia)
-  workflow_dispatch:       # botão para rodar manualmente
+  workflow_dispatch:       # disparado de hora em hora pelo cron-job.org (e manualmente)
 
 permissions:
   contents: write
