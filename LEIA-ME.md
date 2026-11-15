@@ -37,6 +37,16 @@ meu-video.mp4,"Minha legenda com #hashtags"
 ```
 O nome do vídeo tem que ser igual ao arquivo em `videos/`. Use legendas entre aspas.
 
+### Capa (opcional)
+Adicione uma terceira coluna `capa`:
+```
+video,legenda,capa
+meu-video.mp4,"Legenda",meu-video.jpg   ← imagem própria, salva em capas/
+outro-video.mp4,"Legenda",2.5           ← usa o frame do segundo 2,5 do vídeo
+terceiro.mp4,"Legenda",                 ← vazio = Instagram escolhe
+```
+Imagem de capa: JPG, 9:16 (1080x1920), até 8 MB, na pasta `capas/`.
+
 ## Requisitos dos vídeos
 MP4 (H.264 + AAC), vertical 9:16 de preferência, 3 s a 15 min, até 300 MB.
 Dica: arquivos acima de 100 MB não sobem no GitHub — comprima antes.

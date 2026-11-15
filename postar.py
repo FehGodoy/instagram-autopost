@@ -72,25 +72,31 @@ def proximo_post():
         for linha in csv.DictReader(f):
             video = (linha.get("video") or "").strip()
             if video and video not in postados:
-                return video, (linha.get("legenda") or "").strip()
-    return None, None
+                return video, (linha.get("legenda") or "").strip(), (linha.get("capa") or "").strip()
+    return None, None, ""
 
 
-def postar(video, legenda):
+def postar(video, legenda, capa=""):
     url_video = BASE_URL + video
     print(f"Enviando {url_video}")
 
     # 1) cria o container do Reel
-    r = requests.post(
-        f"{API}/{USER_ID}/media",
-        data={
-            "media_type": "REELS",
-            "video_url": url_video,
-            "caption": legenda,
-            "access_token": TOKEN,
-        },
-        timeout=60,
-    )
+    dados = {
+        "media_type": "REELS",
+        "video_url": url_video,
+        "caption": legenda,
+        "access_token": TOKEN,
+    }
+    # Capa opcional: número = segundo do vídeo usado como capa; nome de arquivo = imagem em capas/
+    if capa:
+        try:
+            dados["thumb_offset"] = int(float(capa.replace(",", ".")) * 1000)
+            print(f"  capa: frame em {capa}s")
+        except ValueError:
+            dados["cover_url"] = BASE_URL.replace("/videos/", "/capas/") + capa
+            print(f"  capa: {dados['cover_url']}")
+
+    r = requests.post(f"{API}/{USER_ID}/media", data=dados, timeout=60)
     if not r.ok:
         erro(f"criar container: {r.text}")
     container_id = r.json()["id"]
@@ -136,8 +142,8 @@ if __name__ == "__main__":
         erro("defina IG_USER_ID e VIDEO_BASE_URL")
 
     escolher_api()
-    video, legenda = proximo_post()
+    video, legenda, capa = proximo_post()
     if not video:
         print("Fila vazia — nada para postar.")
         sys.exit(0)
-    postar(video, legenda)
+    postar(video, legenda, capa)
