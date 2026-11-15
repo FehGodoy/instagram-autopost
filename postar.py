@@ -20,12 +20,14 @@ from pathlib import Path
 
 import requests
 
-API = "https://graph.instagram.com/v21.0"
 PASTA = Path(__file__).parent
 CSV_POSTS = PASTA / "posts.csv"
 LOG_POSTADOS = PASTA / "postados.txt"
 
-TOKEN = os.environ.get("IG_TOKEN", "")
+TOKEN = os.environ.get("IG_TOKEN", "").strip()
+# Tokens "IGAA..." usam graph.instagram.com; tokens "EAA..." (login unificado/Facebook) usam graph.facebook.com
+API = ("https://graph.instagram.com/v21.0" if TOKEN.startswith("IG")
+       else "https://graph.facebook.com/v21.0")
 USER_ID = os.environ.get("IG_USER_ID", "")
 BASE_URL = os.environ.get("VIDEO_BASE_URL", "").rstrip("/") + "/"
 
@@ -36,6 +38,8 @@ def erro(msg):
 
 
 def renovar_token():
+    if not TOKEN.startswith("IG"):
+        erro("renovação automática só vale para tokens IGAA; gere um novo token no painel da Meta")
     r = requests.get(
         "https://graph.instagram.com/refresh_access_token",
         params={"grant_type": "ig_refresh_token", "access_token": TOKEN},
